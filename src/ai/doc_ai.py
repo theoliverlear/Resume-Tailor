@@ -1,9 +1,12 @@
 import json
+import os
 import tkinter as tk
+
+from dotenv import load_dotenv
 from openai import OpenAI
 
-from main import open_ai_key
-
+load_dotenv()
+open_ai_key = os.getenv('OPEN_AI_KEY')
 
 def get_text_input():
     def get_and_close():
@@ -34,12 +37,12 @@ def call_open_ai():
     The values should be returned in Title Case.
     Hard skills limit = 9, soft skills limit  = 4.
     Ensure that the returned skills are the most relevant and hirable according to the job application. Return each section in a hierarchical order as to the most relevant on top and the lesser relevant on bottom.
+    Limit individual skill's text to 20 characters.
     Do not put your response in a formatted block. Instead just provide the JSON directly.
     Make sure to include all braces needed.
     Text:
     {text}
     """
-    print('calling open ai')
     open_ai_messenger = OpenAI(api_key=open_ai_key)
     response = open_ai_messenger.chat.completions.create(
         model="gpt-4o-mini",
@@ -53,5 +56,6 @@ def call_open_ai():
     print(response_content)
     json_response = json.loads(response_content)
     print(json_response)
-
-call_open_ai()
+    skill_list = list(json_response["hardSkills"] + json_response["softSkills"])
+    print(skill_list)
+    return skill_list
